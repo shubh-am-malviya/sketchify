@@ -1,14 +1,26 @@
+import { changeBrushSize, changeColor } from "@/store/slices/toolboxSlice";
 import { COLORS, MENU_ITEMS } from "@/utils/constant";
-import { useSelector } from "react-redux";
+import cx from "classnames";
+import { useDispatch, useSelector } from "react-redux";
 import classes from "./index.module.css";
-const ToolBox = () => {
-	const activeMenuItem = useSelector((state) => state.menu.activeMenuItem);
 
+const ToolBox = () => {
+	const dispatch = useDispatch();
+	const activeMenuItem = useSelector((state) => state.menu.activeMenuItem);
+	const { color, size } = useSelector((state) => state.toolBox[activeMenuItem]);
+
+	const isEraserEnable = activeMenuItem === MENU_ITEMS.ERASER;
 	const showStrokeToolOption = activeMenuItem === MENU_ITEMS.PENCIL;
 	const showBrushToolOption =
 		activeMenuItem === MENU_ITEMS.PENCIL || activeMenuItem === MENU_ITEMS.ERASER;
 
-	const updateBrushSize = () => {};
+	const updateBrushSize = (e) => {
+		dispatch(changeBrushSize({ item: activeMenuItem, size: e.target.value }));
+	};
+
+	const updateColor = (newColor) => {
+		dispatch(changeColor({ item: activeMenuItem, color: newColor }));
+	};
 
 	return (
 		<div className={classes.toolboxContainer}>
@@ -16,20 +28,51 @@ const ToolBox = () => {
 				<div className={classes.toolItem}>
 					<h4 className={classes.toolText}>Stoke Color</h4>
 					<div className={classes.itemContainer}>
-						<div className={classes.colorBox} style={{ backgroundColor: COLORS.BLACK }} />
-						<div className={classes.colorBox} style={{ backgroundColor: COLORS.BLUE }} />
-						<div className={classes.colorBox} style={{ backgroundColor: COLORS.GREEN }} />
-						<div className={classes.colorBox} style={{ backgroundColor: COLORS.ORANGE }} />
-						<div className={classes.colorBox} style={{ backgroundColor: COLORS.RED }} />
-						<div className={classes.colorBox} style={{ backgroundColor: COLORS.YELLOW }} />
+						<div
+							className={cx(classes.colorBox, { [classes.active]: color === COLORS.BLACK })}
+							style={{ backgroundColor: COLORS.BLACK }}
+							onClick={() => updateColor(COLORS.BLACK)}
+						/>
+						<div
+							className={cx(classes.colorBox, { [classes.active]: color === COLORS.BLUE })}
+							style={{ backgroundColor: COLORS.BLUE }}
+							onClick={() => updateColor(COLORS.BLUE)}
+						/>
+						<div
+							className={cx(classes.colorBox, { [classes.active]: color === COLORS.GREEN })}
+							style={{ backgroundColor: COLORS.GREEN }}
+							onClick={() => updateColor(COLORS.GREEN)}
+						/>
+						<div
+							className={cx(classes.colorBox, { [classes.active]: color === COLORS.ORANGE })}
+							style={{ backgroundColor: COLORS.ORANGE }}
+							onClick={() => updateColor(COLORS.ORANGE)}
+						/>
+						<div
+							className={cx(classes.colorBox, { [classes.active]: color === COLORS.RED })}
+							style={{ backgroundColor: COLORS.RED }}
+							onClick={() => updateColor(COLORS.RED)}
+						/>
+						<div
+							className={cx(classes.colorBox, { [classes.active]: color === COLORS.YELLOW })}
+							style={{ backgroundColor: COLORS.YELLOW }}
+							onClick={() => updateColor(COLORS.YELLOW)}
+						/>
 					</div>
 				</div>
 			)}
 			{showBrushToolOption && (
 				<div className={classes.toolItem}>
-					<h4 className={classes.toolText}>Brush Size</h4>
+					<h4 className={classes.toolText}>{isEraserEnable ? "Eraser " : "Brush"} Size</h4>
 					<div className={classes.itemContainer}>
-						<input type="range" min={1} max={10} step={1} onChange={updateBrushSize} />
+						<input
+							type="range"
+							value={size}
+							min={isEraserEnable ? 2 : 1}
+							max={isEraserEnable ? 30 : 10}
+							step={isEraserEnable ? 2 : 1}
+							onChange={updateBrushSize}
+						/>
 					</div>
 				</div>
 			)}

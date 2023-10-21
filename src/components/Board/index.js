@@ -18,7 +18,7 @@ const Board = () => {
 	useLayoutEffect(() => {
 		if (!canvasRef.current) return;
 		const canvas = canvasRef.current;
-		const context = canvas.getContext("2d");
+		const context = canvas.getContext("2d", { willReadFrequently: true });
 
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
@@ -48,7 +48,6 @@ const Board = () => {
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 			drawHistory.current.push(imageData);
 			historyPointer.current = drawHistory.current.length - 1;
-			console.log(historyPointer.current);
 		};
 
 		canvas.addEventListener("mousedown", handleMouseDown);
@@ -65,7 +64,7 @@ const Board = () => {
 	useEffect(() => {
 		if (!canvasRef.current) return;
 		const canvas = canvasRef.current;
-		const context = canvas.getContext("2d");
+		const context = canvas.getContext("2d", { willReadFrequently: true });
 
 		const config = () => {
 			context.lineWidth = size;
@@ -78,7 +77,7 @@ const Board = () => {
 	useEffect(() => {
 		if (!canvasRef.current) return;
 		const canvas = canvasRef.current;
-		const context = canvas.getContext("2d");
+		const context = canvas.getContext("2d", { willReadFrequently: true });
 
 		if (actionMenuItem === MENU_ITEMS.DOWNLOAD) {
 			const URL = canvas.toDataURL();
@@ -98,7 +97,6 @@ const Board = () => {
 
 			const imageData = drawHistory.current[historyPointer.current];
 			context.putImageData(imageData, 0, 0);
-			console.log(historyPointer.current);
 		}
 
 		dispatch(actionItemClick(null));

@@ -1,27 +1,38 @@
-import { COLORS } from "@/utils/constant";
+import { COLORS, MENU_ITEMS } from "@/utils/constant";
+import { useSelector } from "react-redux";
 import classes from "./index.module.css";
 const ToolBox = () => {
+	const activeMenuItem = useSelector((state) => state.menu.activeMenuItem);
+
+	const showStrokeToolOption = activeMenuItem === MENU_ITEMS.PENCIL;
+	const showBrushToolOption =
+		activeMenuItem === MENU_ITEMS.PENCIL || activeMenuItem === MENU_ITEMS.ERASER;
+
 	const updateBrushSize = () => {};
 
 	return (
 		<div className={classes.toolboxContainer}>
-			<div className={classes.toolItem}>
-				<h4 className={classes.toolText}>Stoke Color</h4>
-				<div className={classes.itemContainer}>
-					<div className={classes.colorBox} style={{ backgroundColor: COLORS.BLACK }} />
-					<div className={classes.colorBox} style={{ backgroundColor: COLORS.BLUE }} />
-					<div className={classes.colorBox} style={{ backgroundColor: COLORS.GREEN }} />
-					<div className={classes.colorBox} style={{ backgroundColor: COLORS.ORANGE }} />
-					<div className={classes.colorBox} style={{ backgroundColor: COLORS.RED }} />
-					<div className={classes.colorBox} style={{ backgroundColor: COLORS.YELLOW }} />
+			{showStrokeToolOption && (
+				<div className={classes.toolItem}>
+					<h4 className={classes.toolText}>Stoke Color</h4>
+					<div className={classes.itemContainer}>
+						<div className={classes.colorBox} style={{ backgroundColor: COLORS.BLACK }} />
+						<div className={classes.colorBox} style={{ backgroundColor: COLORS.BLUE }} />
+						<div className={classes.colorBox} style={{ backgroundColor: COLORS.GREEN }} />
+						<div className={classes.colorBox} style={{ backgroundColor: COLORS.ORANGE }} />
+						<div className={classes.colorBox} style={{ backgroundColor: COLORS.RED }} />
+						<div className={classes.colorBox} style={{ backgroundColor: COLORS.YELLOW }} />
+					</div>
 				</div>
-			</div>
-			<div className={classes.toolItem}>
-				<h4 className={classes.toolText}>Brush Size</h4>
-				<div className={classes.itemContainer}>
-					<input type="range" min={1} max={10} step={1} onChange={updateBrushSize} />
+			)}
+			{showBrushToolOption && (
+				<div className={classes.toolItem}>
+					<h4 className={classes.toolText}>Brush Size</h4>
+					<div className={classes.itemContainer}>
+						<input type="range" min={1} max={10} step={1} onChange={updateBrushSize} />
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };

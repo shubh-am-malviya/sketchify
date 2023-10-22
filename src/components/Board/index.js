@@ -38,7 +38,6 @@ const Board = () => {
 		};
 
 		const saveHistory = () => {
-			console.log("SAVING_HISTORY");
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 			drawHistory.current.push(imageData);
 			historyPointer.current = drawHistory.current.length - 1;
@@ -132,7 +131,6 @@ const Board = () => {
 			)
 				historyPointer.current += 1;
 
-			console.log("DRAW_HIS", drawHistory.current);
 			const imageData = drawHistory.current[historyPointer.current];
 			context.putImageData(imageData, 0, 0);
 		}

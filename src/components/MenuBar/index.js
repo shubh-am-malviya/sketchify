@@ -11,11 +11,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import cx from "classnames";
 import { useDispatch, useSelector } from "react-redux";
 
+import { socket } from "@/socket";
+import { useEffect } from "react";
 import styles from "./index.module.css";
 
 const Menu = () => {
 	const dispatch = useDispatch();
 	const activeMenuItem = useSelector((state) => state.menu.activeMenuItem);
+
+	useEffect(() => {
+		socket.on("actionClick", (arg) => {
+			arg.actionName !== MENU_ITEMS.DOWNLOAD && dispatch(actionItemClick(arg.actionName));
+		});
+		return () => {
+			socket.off("actionClick");
+		};
+	}, [dispatch]);
 
 	const handleMenuClick = (menuName) => {
 		dispatch(menuItemClick(menuName));
@@ -23,6 +34,7 @@ const Menu = () => {
 
 	const handleActionClick = (actionName) => {
 		dispatch(actionItemClick(actionName));
+		socket.emit("actionClick", { actionName });
 	};
 
 	return (

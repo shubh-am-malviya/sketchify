@@ -1,3 +1,4 @@
+import { socket } from "@/socket";
 import { actionItemClick } from "@/store/slices/menuSlice";
 import { MENU_ITEMS } from "@/utils/constant";
 import { useEffect, useLayoutEffect, useRef } from "react";
@@ -33,31 +34,55 @@ const Board = () => {
 			context.stroke();
 		};
 
+		const saveHistory = () => {
+			console.log("SAVING_HISTORY");
+			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+			drawHistory.current.push(imageData);
+			historyPointer.current = drawHistory.current.length - 1;
+		};
+
 		const handleMouseDown = (e) => {
 			shouldDraw.current = true;
 			beginPath(e.clientX, e.clientY);
+			socket.emit("beginPath", { x: e.clientX, y: e.clientY });
 		};
 
 		const handleMouseMove = (e) => {
 			if (!shouldDraw.current) return;
 			drawLine(e.clientX, e.clientY);
+			socket.emit("drawLine", { x: e.clientX, y: e.clientY });
 		};
 
 		const handleMouseUp = () => {
 			shouldDraw.current = false;
-			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			drawHistory.current.push(imageData);
-			historyPointer.current = drawHistory.current.length - 1;
+			saveHistory();
+			socket.emit("drawLineCompleted", {});
+		};
+
+		const handleBeginPath = (path) => {
+			beginPath(path.x, path.y);
+		};
+
+		const handleDrawLine = (path) => {
+			drawLine(path.x, path.y);
 		};
 
 		canvas.addEventListener("mousedown", handleMouseDown);
 		canvas.addEventListener("mousemove", handleMouseMove);
 		canvas.addEventListener("mouseup", handleMouseUp);
 
+		socket.on("beginPath", handleBeginPath);
+		socket.on("drawLine", handleDrawLine);
+		socket.on("drawLineCompleted", saveHistory);
+
 		return () => {
 			canvas.removeEventListener("mousedown", handleMouseDown);
 			canvas.removeEventListener("mousemove", handleMouseMove);
 			canvas.removeEventListener("mouseup", handleMouseUp);
+
+			socket.off("beginPath", handleBeginPath);
+			socket.off("drawLine", handleDrawLine);
+			socket.off("drawLineCompleted", saveHistory);
 		};
 	}, []);
 
@@ -66,12 +91,21 @@ const Board = () => {
 		const canvas = canvasRef.current;
 		const context = canvas.getContext("2d", { willReadFrequently: true });
 
-		const config = () => {
+		const changeConfig = (color, size) => {
 			context.lineWidth = size;
 			context.strokeStyle = color;
 		};
 
-		config();
+		const handleChangeConfig = (config) => {
+			changeConfig(config.color, config.size);
+		};
+
+		changeConfig(color, size);
+		socket.on("changeConfig", handleChangeConfig);
+
+		return () => {
+			socket.off("changeConfig", handleChangeConfig);
+		};
 	}, [color, size]);
 
 	useEffect(() => {
@@ -95,6 +129,7 @@ const Board = () => {
 			)
 				historyPointer.current += 1;
 
+			console.log("DRAW_HIS", drawHistory.current);
 			const imageData = drawHistory.current[historyPointer.current];
 			context.putImageData(imageData, 0, 0);
 		}

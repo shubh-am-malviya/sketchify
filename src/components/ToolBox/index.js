@@ -1,3 +1,4 @@
+import { socket } from "@/socket";
 import { changeBrushSize, changeColor } from "@/store/slices/toolboxSlice";
 import { COLORS, MENU_ITEMS } from "@/utils/constant";
 import cx from "classnames";
@@ -16,10 +17,13 @@ const ToolBox = () => {
 
 	const updateBrushSize = (e) => {
 		dispatch(changeBrushSize({ item: activeMenuItem, size: e.target.value }));
+		activeMenuItem === MENU_ITEMS.PENCIL &&
+			socket.emit("changeConfig", { color, size: e.target.value });
 	};
 
 	const updateColor = (newColor) => {
 		dispatch(changeColor({ item: activeMenuItem, color: newColor }));
+		activeMenuItem === MENU_ITEMS.PENCIL && socket.emit("changeConfig", { color: newColor, size });
 	};
 
 	return (

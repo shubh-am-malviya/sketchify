@@ -1,6 +1,6 @@
 import { socket } from "@/socket";
 import { actionItemClick } from "@/store/slices/menuSlice";
-import { MENU_ITEMS } from "@/utils/constant";
+import { COLORS, MENU_ITEMS } from "@/utils/constant";
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -23,6 +23,9 @@ const Board = () => {
 
 		canvas.width = window.innerWidth;
 		canvas.height = window.innerHeight;
+
+		context.fillStyle = COLORS.WHITE;
+		context.fillRect(0, 0, canvas.width, canvas.height);
 
 		const beginPath = (x, y) => {
 			context.beginPath();

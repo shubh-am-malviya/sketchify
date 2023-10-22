@@ -18,6 +18,7 @@ import styles from "./index.module.css";
 const Menu = () => {
 	const dispatch = useDispatch();
 	const activeMenuItem = useSelector((state) => state.menu.activeMenuItem);
+	const { color, size } = useSelector((state) => state.toolBox[activeMenuItem]);
 
 	useEffect(() => {
 		socket.on("actionClick", (arg) => {
@@ -30,6 +31,7 @@ const Menu = () => {
 
 	const handleMenuClick = (menuName) => {
 		dispatch(menuItemClick(menuName));
+		socket.emit("changeConfig", { color, size });
 	};
 
 	const handleActionClick = (actionName) => {
